@@ -1,0 +1,14 @@
+// @formatter:off
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: { font: { file: font.fnt } },
+  com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {down: default-round-down, up: default-round, font: font },
+  }
+  com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
+	default: { down: default-back-down, up: default-back },
+	menupause: { down: menu-pause-down, up: menu-pause },
+	menurestart: { down: menu-restart-down, up: menu-restart },
+	menuquit: { down: menu-quit-down, up: menu-quit },
+	menuplaywater: { down: menu-playwater-down, up: menu-playwater },
+  }
+}

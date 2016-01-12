@@ -1,0 +1,124 @@
+
+unamed.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+placeHolder1
+  rotate: false
+  xy: 1, 209
+  size: 178, 301
+  orig: 178, 301
+  offset: 0, 0
+  index: -1
+optionsButton
+  rotate: false
+  xy: 181, 448
+  size: 307, 62
+  orig: 307, 62
+  offset: 0, 0
+  index: -1
+playbutton
+  rotate: false
+  xy: 181, 386
+  size: 305, 60
+  orig: 305, 60
+  offset: 0, 0
+  index: -1
+playGameTitle
+  rotate: false
+  xy: 181, 324
+  size: 302, 60
+  orig: 302, 60
+  offset: 0, 0
+  index: -1
+mainmenu
+  rotate: false
+  xy: 181, 267
+  size: 306, 55
+  orig: 306, 55
+  offset: 0, 0
+  index: -1
+textBox
+  rotate: false
+  xy: 1, 130
+  size: 199, 77
+  orig: 199, 77
+  offset: 0, 0
+  index: -1
+startButton
+  rotate: false
+  xy: 1, 64
+  size: 176, 64
+  orig: 176, 64
+  offset: 0, 0
+  index: -1
+backButton
+  rotate: false
+  xy: 1, 1
+  size: 177, 61
+  orig: 177, 61
+  offset: 0, 0
+  index: -1
+placeHolder2
+  rotate: false
+  xy: 202, 187
+  size: 48, 78
+  orig: 48, 78
+  offset: 0, 0
+  index: -1
+noMusic
+  rotate: false
+  xy: 202, 153
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+noMusicPressed
+  rotate: false
+  xy: 252, 233
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+noSound
+  rotate: false
+  xy: 252, 199
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+noSoundPressed
+  rotate: false
+  xy: 286, 233
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+yesMusic
+  rotate: false
+  xy: 286, 199
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+yesMusicPressed
+  rotate: false
+  xy: 320, 233
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+yesSound
+  rotate: false
+  xy: 320, 199
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+yesSoundPressed
+  rotate: false
+  xy: 354, 233
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1

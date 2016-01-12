@@ -27,7 +27,6 @@ public class LevelSelectStage extends Stage{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				game.changeStage(STAGE.MAINMENU);
-				Gdx.app.log("LevelSelect - BackButton", "Click");
 				super.clicked(event, x, y);
 			}
 		});

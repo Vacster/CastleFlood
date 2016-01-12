@@ -1,12 +1,12 @@
 {
-  "stickAmount": 0,
-  "rockAmount": 5,
-  "woodBoxAmount": 5,
-  "bronzeBoxAmount": 5,
-  "concreteBoxAmount": 5,
-  "concreteTriangleAmount": 5,
-  "steelBoxAmount": 5,
-  "ironBoxAmount": 5,
-  "goldBoxAmount": 0,
-  "waterAmount": 125
+  "stick": 5,
+  "rock": 5,
+  "woodenBox": 0,
+  "bronze": 5,
+  "concreteBox": 0,
+  "iron": 5,
+  "concreteTriangle": 0,
+  "steelBox": 5,
+  "goldBox": 0,
+  "waterAmount": 100
 }

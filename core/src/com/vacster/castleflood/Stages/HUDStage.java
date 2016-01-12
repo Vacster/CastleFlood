@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.vacster.castleflood.Box2DDefinition;
 import com.vacster.castleflood.CastleFlood;
+import com.vacster.castleflood.ItemLoader;
 import com.vacster.castleflood.LevelLoader;
 
 import Actors.Background;
@@ -34,22 +35,16 @@ import Actors.WaterActor;
 
 public class HUDStage extends Stage{
 
-
-	private float locations[];
-	private OrthographicCamera camera;
+	private OrthographicCamera camera;//changing this would be fucking horrible wow vvvvvv
 	private HashMap<String, Sprite> sprites;//could probably be <int, obj>
 	private HashMap<String, PolygonShape> shapes;//could probably be <int, obj>
 	private HashMap<String, Box2DDefinition> definitions;//could probably be <int, obj>
 	private HashMap<String, Integer> items;//could probably be <int, obj>
 	private ArrayList<String> creators;//if others change this must too
-	private ArrayList<Box2DObjectCreator> creatorObjects;
+	private ArrayList<Box2DObjectCreator> creatorObjects;//all this ^^^^^^^^^^
 	private ArrayList<WaterActor> water = new ArrayList<WaterActor>();
+	private ItemLoader itemLoader;
 	private Table table;
-	private String concreteBox  = "concreteBox", concreteTriangle = "concreteTriangle",//could be ints
-			woodenBox = "woodenBox", goldBox = "goldBox", steelBox = "steelBox", rock = "rock",
-			waterStr = "water", stick = "stick", bronze = "bronze", iron = "iron";
-	private int currLocation = 0;
-	private float fontScale = 0.15f;//hack
 	private Group menuGroup, pauseGroup;
 	private Skin skin;
 	private CastleFlood CFGame;
@@ -60,6 +55,11 @@ public class HUDStage extends Stage{
 	private CircleShape waterShape;
 	private Sprite waterSpr;
 	public boolean paused = false, playing = false;
+	private int currLocation = 0;
+	private float fontScale = 0.15f, locations[];;//hack
+	private String concreteBox  = "concreteBox", concreteTriangle = "concreteTriangle",//could be simplified.... somehow?
+			woodenBox = "woodenBox", goldBox = "goldBox", steelBox = "steelBox", rock = "rock",
+			waterStr = "water", stick = "stick", bronze = "bronze", iron = "iron";
 	
 	public HUDStage(Skin skin, final CastleFlood game, final World world, int currentLevel, final GameStage gameStage) {
 		//optimization: only create 1 box2dobject as box and copy it for every new one
@@ -68,27 +68,20 @@ public class HUDStage extends Stage{
 		CFGame = game;
 		gamestage = gameStage;
 		
+		itemLoader = new ItemLoader();
+		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 320, 180);
+		
 		getViewport().setCamera(camera);
-
+		
 		addActor(new Background(new Texture(Gdx.files.internal("hud.png"))));
 
 		table = new Table();
 		table.setWidth(getWidth());
 		table.setHeight(getHeight());
-
-		creators = new ArrayList<String>();
-		creators.add(stick);
-		creators.add(rock);
-		creators.add(woodenBox);
-		creators.add(bronze);
-		creators.add(iron);
-		creators.add(concreteBox);
-		creators.add(steelBox);
-		creators.add(goldBox);
-		creators.add(concreteTriangle);
-
+		
+		initStrings();
 		locations = setLocations();
 		initLevel(currentLevel);
 		initSprites();
@@ -96,10 +89,10 @@ public class HUDStage extends Stage{
 		initWater();
 		setDefinitions(world);
 		initCreators(gameStage);
-
+		
 		addActor(table);
 		//setDebugAll(true);
-
+		
 		initMenuButtons(skin, game);
 		table.addActor(pauseGroup);
 		table.setZIndex(1000);
@@ -170,6 +163,85 @@ public class HUDStage extends Stage{
 		});
 		pauseGroup.addActor(playButton);
 	}
+
+	private void initStrings(){//kinda ugly / repetitive. let's make a json! lel. actually, that could work...? jsonvalue.getindex(int) ..?
+		creators = new ArrayList<String>();//gonna need reference to the amount of strings in there... first line is amount!... seems ugly...?
+		creators.add(stick);//                     jsonvalue.size exists/ what does it refer to exactly?
+		creators.add(rock);	//		JsonValue map = ...;
+		creators.add(woodenBox);//		 for (JsonValue entry = map.child; entry != null; entry = entry.next)
+		creators.add(bronze); // supposedly more effective, but seems odd. entry = map.child...?
+		creators.add(iron);
+		creators.add(concreteBox);
+		creators.add(steelBox);
+		creators.add(goldBox);
+		creators.add(concreteTriangle);
+//	
+	}
+	
+	private float[] setLocations(){
+		float array[] = {27f, 66f, 106f, 147f, 187f, 227f, 267f};//hack
+		return array;
+	}
+	
+	private void initLevel(int level){
+		items = new HashMap<String, Integer>();
+		LevelLoader loader = new LevelLoader(level, creators);
+		for(int x = 0; x < creators.size(); x++){
+			items.put(creators.get(x), loader.getAmount(x));
+		}
+		items.put(waterStr, loader.getWater());
+	}
+	
+	private void initSprites(){//special cases -stick -column?
+		sprites = new HashMap<String, Sprite>();
+		sprites.put("lock", new Sprite(new Texture(Gdx.files.internal("lock.png"))));
+		sprites.put("pauseMenu", new Sprite(new Texture(Gdx.files.internal("pauseMenu.png"))));
+		for(int x = 0; x < creators.size(); x++){
+			Sprite tmp = new Sprite(new Texture(Gdx.files.internal("sprites/"+creators.get(x)+".png")));
+			tmp.setSize(20f, 20f);
+			sprites.put(creators.get(x), tmp);
+		}
+	}
+	
+	private void initShapes(){//?
+		shapes = new HashMap<String, PolygonShape>();
+
+		PolygonShape boxShape = new PolygonShape();
+		PolygonShape triangleShape = new PolygonShape();
+		PolygonShape rockShape = new PolygonShape();
+		PolygonShape stickShape = new PolygonShape();
+		
+		boxShape.setAsBox(5f,  5f);
+		
+		Vector2[] triangleVertices = new Vector2[3];
+		triangleVertices[0] = new Vector2(5f, -5f);
+		triangleVertices[1] = new Vector2(-5f, -5f);
+		triangleVertices[2] = new Vector2(-5f, 5f);//funny hack for weird problem
+		triangleShape.set(triangleVertices);
+		
+		Vector2[] rockVertices = new Vector2[8];
+		rockVertices[0] = new Vector2(-1.5f, 6f);
+		rockVertices[1] = new Vector2(-6.25f, 1.9f);
+		rockVertices[2] = new Vector2(-6.25f, -3.45f);//LOL
+		rockVertices[3] = new Vector2(-4.75f, -6.25f);
+		rockVertices[4] = new Vector2(4.7f, -6.25f);
+		rockVertices[5] = new Vector2(6.25f, -3.75f);
+		rockVertices[6] = new Vector2(6.25f, 1.80f);
+		rockVertices[7] = new Vector2(5f, 4.60f);
+		rockShape.set(rockVertices);
+
+		stickShape.setAsBox(3.75f, 9.5f);//lol
+
+		shapes.put(stick, stickShape);
+		shapes.put(rock, rockShape);
+		shapes.put(woodenBox, boxShape);
+		shapes.put(bronze, boxShape);
+		shapes.put(iron, boxShape);
+		shapes.put(concreteBox, boxShape);
+		shapes.put(steelBox, boxShape);
+		shapes.put(goldBox, boxShape);
+		shapes.put(concreteTriangle, triangleShape);
+	}
 	
 	private void initWater() {
 		waterSpr = new Sprite(new Texture(Gdx.files.internal("water.png")));
@@ -178,12 +250,32 @@ public class HUDStage extends Stage{
 		waterFixtureDef = new FixtureDef();
 		waterBodyDef = new BodyDef();
 		
-		waterShape.setRadius(waterSpr.getHeight()/5);
+		waterShape.setRadius(4f); //hack
 		waterBodyDef.type = BodyType.DynamicBody;
 		waterFixtureDef.density = 6f;
 		waterFixtureDef.friction = 0.1f;
 		waterFixtureDef.restitution = 0.8f;
 		waterFixtureDef.shape = waterShape;
+	}
+	
+	private void setDefinitions(World world){//that's hot
+		definitions = new HashMap<String, Box2DDefinition>();
+		
+		for(String str : creators)
+			if(items.get(str)>0)
+				definitions.put(str, new Box2DDefinition(setValues(str), shapes.get(str), sprites.get(str), world));
+	}
+	
+	private void initCreators(Stage gameStage){
+		creatorObjects = new ArrayList<Box2DObjectCreator>();
+		
+		int x = 0;
+		for(String str : creators)
+			if(items.get(str) > 0)
+				addCreator(str, gameStage, x++);
+		
+		for(int y = x; y < 7; y++)
+			addActor(new Lock(locations[y], sprites.get("lock")));
 	}
 	
 	private void createWater() {
@@ -236,169 +328,22 @@ public class HUDStage extends Stage{
 		}
 	}
 	
-	private void initCreators(Stage gameStage){
-		creatorObjects = new ArrayList<Box2DObjectCreator>();
-		
-		int x = 0;
-		for(String str : creators)
-			if(items.get(str) > 0)
-				addCreator(str, gameStage, x++);
-		
-		for(int y = x; y < 7; y++)
-			addActor(new Lock(locations[y], sprites.get("lock")));
-	}
-	
 	private void addCreator(String name, Stage stage, int location){
-		Sprite spr = sprites.get(name);//fuck, really gotta change this     vvvvvvvvvvvvvvvvvvvvvvvvvv 
-		Box2DObjectCreator act = new Box2DObjectCreator(locations[location]+(name.equals(stick)?4f:0f), items.get(name), spr, stage, definitions.get(name), camera);
+		Sprite spr = sprites.get(name);//Not yet fixed, special occasion sprites x coordinate.
+		Box2DObjectCreator act = new Box2DObjectCreator(locations[location], items.get(name), spr, stage, definitions.get(name), camera);
 		act.setBounds(act.getX(), act.getY(), spr.getWidth(), spr.getHeight());
 		creatorObjects.add(act);
 		table.addActor(act);
 	}
-
-	private float[] setLocations(){
-		float array[] = {27f, 66f, 106f, 147f, 187f, 227f, 267f};//hack
-		return array;
-	}
 	
 	private float[] setValues(String box){
-		//{WIDTH, HEIGHT, X, Y, DENSITY, FRICTION, RESTITUTION}
-		switch(box){//kinda hack-ish hardcoded values 
-		case "stick":
-			float[] tmp0 = {7.5f, 19f, locations[currLocation++]+10f, 150f, 5f, 0.6f, 0.0f};
-			return tmp0;
-		case "rock":
-			float[] tmp1 = {12.5f, 12.5f, locations[currLocation++]+10f, 150f, 5f, 0.6f, 0.0f};
-			return tmp1;
-		case "woodenBox":
-			float[] tmp2 = {10f, 10f, locations[currLocation++]+10f, 150f, 5f, 0.6f, 0.0f};
-			return tmp2;
-		case "bronze":
-			float[] tmp3 = {10f, 10f, locations[currLocation++]+10f, 150f, 5f, 0.6f, 0.0f};
-			return tmp3;
-		case "iron":
-			float[] tmp8 = {10f, 10f, locations[currLocation++]+10f, 150f, 5f, 0.6f, 0.0f};
-			return tmp8;
-		case "concreteBox"://fix this ugly shit
-			float[] tmp4 = {10f, 10f, locations[currLocation++]+10f, 150f, 10f, 0.6f, 0.0f};  
-			return tmp4;
-		case "steelBox"://holy fuck is this disgusting
-			float[] tmp5 = {10f, 10f, locations[currLocation++]+10f, 150f, 15f, 0.6f, 0.0f};
-			return tmp5;
-		case "goldBox"://kill me
-			float[] tmp6 = {10f, 10f, locations[currLocation++]+10f, 150f, 20f, 0.6f, 0.0f};
-			return tmp6;
-		case "concreteTriangle"://end my misery please
-			float[] tmp7 = {10f, 10f, locations[currLocation++]+10f, 150f, 15f, 0.8f, 0.0f};
-			return tmp7;
-		default://ouch
-			return null;
-		}
+		return itemLoader.getValues(box, locations[currLocation++]+10f, 150f);
 	}
 	
-	private void setDefinitions(World world){//SIMPLIFY BY AAAAA LOOOTTTT
-		definitions = new HashMap<String, Box2DDefinition>();
-		
-		for(String str : creators)
-			if(items.get(str)>0)
-				definitions.put(str, new Box2DDefinition(setValues(str), shapes.get(str), sprites.get(str), world));
-	}
 	
-	private void initLevel(int level){
-		items = new HashMap<String, Integer>();
-		LevelLoader loader = new LevelLoader(level);
-		items.put(stick, loader.stickAmount);
-		items.put(rock, loader.rockAmount);
-		items.put(woodenBox, loader.woodBoxAmount);
-		items.put(bronze, loader.bronzeBoxAmount);
-		items.put(iron, loader.ironBoxAmount);
-		items.put(concreteBox, loader.concreteBoxAmount);
-		items.put(steelBox, loader.steelBoxAmount);
-		items.put(goldBox, loader.goldBoxAmount);
-		items.put(concreteTriangle, loader.concreteTriangleAmount);
-		items.put(waterStr, loader.waterAmount);
-	}
 	
-	private void initSprites(){//improve
-		sprites = new HashMap<String, Sprite>();
-		
-		Sprite stickSpr = new Sprite(new Texture(Gdx.files.internal("stick_wood.png")));
-		stickSpr.setSize(10f, 20f);
-		
-		Sprite rockSpr = new Sprite(new Texture(Gdx.files.internal("rock.png")));
-		rockSpr.setSize(20f, 20f);
-		
-		Sprite woodBoxSpr = new Sprite(new Texture(Gdx.files.internal("block_wood.png")));
-		woodBoxSpr.setSize(20f, 20f);
-		
-		Sprite bronzeSpr = new Sprite(new Texture(Gdx.files.internal("block_bronze.png")));
-		bronzeSpr.setSize(20f, 20f);
-		
-		Sprite ironSpr = new Sprite(new Texture(Gdx.files.internal("block_iron.png")));
-		ironSpr.setSize(20f, 20f);
-		
-		Sprite concreteBoxSpr = new Sprite(new Texture(Gdx.files.internal("block_concrete.png")));
-		concreteBoxSpr.setSize(20f, 20f);
-		
-		Sprite steelBoxSpr = new Sprite(new Texture(Gdx.files.internal("block_steel.png")));
-		steelBoxSpr.setSize(20f, 20f);
-		
-		Sprite goldBoxSpr = new Sprite(new Texture(Gdx.files.internal("block_gold.png")));
-		goldBoxSpr.setSize(20f, 20f);
-		
-		Sprite concreteTriangleSpr = new Sprite(new Texture(Gdx.files.internal("triangle_concrete.png")));
-		concreteTriangleSpr.setSize(20f, 20f);
-		
-		sprites.put("lock", new Sprite(new Texture(Gdx.files.internal("lock.png"))));
-		sprites.put("pauseMenu", new Sprite(new Texture(Gdx.files.internal("pauseMenu.png"))));
-		sprites.put(stick, stickSpr);
-		sprites.put(rock, rockSpr);
-		sprites.put(woodenBox, woodBoxSpr);
-		sprites.put(bronze, bronzeSpr);
-		sprites.put(iron, ironSpr);
-		sprites.put(concreteBox, concreteBoxSpr);
-		sprites.put(steelBox, steelBoxSpr);
-		sprites.put(goldBox, goldBoxSpr);
-		sprites.put(concreteTriangle, concreteTriangleSpr);
-	}
-	
-	private void initShapes(){//?
-		shapes = new HashMap<String, PolygonShape>();
 
-		PolygonShape boxShape = new PolygonShape();
-		PolygonShape triangleShape = new PolygonShape();
-		PolygonShape rockShape = new PolygonShape();
-		PolygonShape stickShape = new PolygonShape();
-		
-		boxShape.setAsBox(5f,  5f);
-		
-		Vector2[] triangleVertices = new Vector2[3];
-		triangleVertices[0] = new Vector2(5f, -5f);
-		triangleVertices[1] = new Vector2(-5f, -5f);
-		triangleVertices[2] = new Vector2(-5f, 5f);//funny hack for weird problem
-		triangleShape.set(triangleVertices);
-		
-		Vector2[] rockVertices = new Vector2[8];
-		rockVertices[0] = new Vector2(-1.5f, 6f);
-		rockVertices[1] = new Vector2(-6.25f, 1.9f);
-		rockVertices[2] = new Vector2(-6.25f, -3.45f);//LOL
-		rockVertices[3] = new Vector2(-4.75f, -6.25f);
-		rockVertices[4] = new Vector2(4.7f, -6.25f);
-		rockVertices[5] = new Vector2(6.25f, -3.75f);
-		rockVertices[6] = new Vector2(6.25f, 1.80f);
-		rockVertices[7] = new Vector2(5f, 4.60f);
-		rockShape.set(rockVertices);
+	
 
-		stickShape.setAsBox(3.75f, 9.5f);//lol
-
-		shapes.put(stick, stickShape);
-		shapes.put(rock, rockShape);
-		shapes.put(woodenBox, boxShape);
-		shapes.put(bronze, boxShape);
-		shapes.put(iron, boxShape);
-		shapes.put(concreteBox, boxShape);
-		shapes.put(steelBox, boxShape);
-		shapes.put(goldBox, boxShape);
-		shapes.put(concreteTriangle, triangleShape);
-	}
+	
 }

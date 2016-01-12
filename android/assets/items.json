@@ -1,0 +1,65 @@
+{
+  "stick": {
+    "width": 7.5, 
+    "height": 19.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "rock": {
+    "width": 12.5, 
+    "height": 12.5,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "woodenBox": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "bronze": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "iron": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "concreteBox": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "steelBox": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "goldBox": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  },
+  "concreteTriangle": {
+    "width": 10.0, 
+    "height": 10.0,
+    "density": 5.0,
+    "friction": 0.6,
+    "restitution": 0.0
+  }
+}

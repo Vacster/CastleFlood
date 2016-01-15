@@ -8,7 +8,6 @@ import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.QueryCallback;
@@ -21,12 +20,13 @@ import com.badlogic.gdx.utils.Array;
 import com.vacster.castleflood.CastleFlood;
 
 import Actors.Background;
+import Actors.Wall;
 
 public class GameStage extends Stage implements GestureListener{
 
 	private World world;
 	private OrthographicCamera camera;
-	@SuppressWarnings("unused") //lol
+	@SuppressWarnings("unused")//lel
 	private Box2DDebugRenderer dr;
 	private Vector3 unprojecter = new Vector3();
 	private Vector2 unprojecterHelper = new Vector2();
@@ -34,25 +34,27 @@ public class GameStage extends Stage implements GestureListener{
 	private MouseJointDef mouseJointDef;
 	private int width = 320, height = 180, positionIterations = 6, velocityIterations = 2;
 	private float timeStep = 1f/60f;
+	public Wall floor;
 	public boolean paused = false, playing = false;
+	public int defaultResources, currentResources;
 	
 	public GameStage(Skin skin, final CastleFlood game, SpriteBatch batch, World world, int level) {
 		this.world = world;
-		
-		mouseJointDef = new MouseJointDef();
-		mouseJointDef.bodyA = world.createBody(new BodyDef());
-		mouseJointDef.collideConnected = true;
-		mouseJointDef.maxForce = 250000.0f;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, width, height);
 		
-		addActor(new Wall(getWidth()/2, 30f, getWidth(), 1f, world));//simplify
+		floor = newFloor();
+		addActor(floor);//simplify
 		addActor(new Wall(-30f, getHeight()/2, 2f, getHeight(), world));//simplify
 		addActor(new Background(new Texture(Gdx.files.internal("runBackground.png"))));	//simplify
 		getViewport().setCamera(camera);
 		
 		dr = new Box2DDebugRenderer();
+		mouseJointDef = new MouseJointDef();
+		mouseJointDef.bodyA = floor.body;
+		mouseJointDef.collideConnected = true;//idk, but it was in the tutorial
+		mouseJointDef.maxForce = 250000.0f;//fix if objects' density changes dramatically
 	}
 	
 	public void restart(){
@@ -60,19 +62,25 @@ public class GameStage extends Stage implements GestureListener{
 		Array<Body> bodies = new Array<Body>();
 		if(mouseJoint != null){
 			world.destroyJoint(mouseJoint);
-			mouseJointDef.bodyA = world.createBody(new BodyDef());
 			mouseJoint = null;
 		}
 		world.getBodies(bodies);
 		for(Body bd : bodies)
 			world.destroyBody(bd);
-		
-		//literally dumbest bug I've ever seen, fuck this
-		addActor(new Wall(getWidth()/2, 30f, getWidth(), 1f, world));//simplify
+
+		currentResources = defaultResources;
+		floor = newFloor();//simplify
+		addActor(floor);//simplify
 		addActor(new Wall(-30f, getHeight()/2, 2f, getHeight(), world));//simplify
 		addActor(new Background(new Texture(Gdx.files.internal("runBackground.png"))));	//simplify
-		camera.zoom = 1.0f;
+		camera.zoom = 1.0f;//hack
 		checkBoundaries();
+		mouseJointDef.bodyA = floor.body;
+	}
+	
+	
+	private Wall newFloor(){//hack
+		return new Wall(getWidth()/2, 30f, getWidth(), 1f, world);
 	}
 	
 	@Override
@@ -90,7 +98,7 @@ public class GameStage extends Stage implements GestureListener{
 	@Override
 	public boolean zoom(float initialDistance, float distance) {
 		if(paused || playing) return false;
-		camera.zoom -= (distance-initialDistance)/10000;      
+		camera.zoom -= (distance-initialDistance)/10000;//hack?   
     	if(camera.zoom>=1.0f) camera.zoom=1.0f;//hack
     	if(camera.zoom<=0.3f) camera.zoom=0.3f;//hack
 		checkBoundaries();
@@ -177,5 +185,10 @@ public class GameStage extends Stage implements GestureListener{
 	@Override
 	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
 		return false;
+	}
+
+	public void updateResources(int resources) {
+		defaultResources = resources;
+		currentResources = defaultResources;
 	}
 }

@@ -8,49 +8,42 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Align;
 import com.vacster.castleflood.Box2DDefinition;
+import com.vacster.castleflood.Stages.GameStage;
 
 public class Box2DObjectCreator extends Actor{
 
 	private Sprite sprite;
-	private int count;
-	private int maxCount;
-	private float posX;
 	private BitmapFont font;
-	public boolean paused = false, playing = false;
+	private String costStr;
+	private float posX;
+	private int cost;
 
-	public Box2DObjectCreator(float posX, final int maxCount, Sprite sprite, final Stage stage, final Box2DDefinition definition, OrthographicCamera camera) {
+	public Box2DObjectCreator(float posX, float offSet, Sprite sprite, final GameStage stage, final Box2DDefinition definition, OrthographicCamera camera) {
 			this.sprite = sprite;
-			setPosition(posX, 5f);//hack
-			sprite.setPosition(posX, 5f);//hack
-			setTouchable(Touchable.enabled);
-			this.maxCount = maxCount;
-			count = maxCount;
+			this.cost = definition.getCost();
+			setPosition(posX+offSet, 5f);//hack
+			sprite.setPosition(posX+offSet, 5f);//hack
 			addListener(new InputListener(){
 				@Override
 				public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-					if(count>0 && !paused && !playing){
-						stage.addActor(new Box2DObject(definition));
-						count--;
+					if(!stage.paused && !stage.playing && stage.currentResources >= cost){
+							stage.addActor(new Box2DObject(definition));
+							stage.currentResources-=cost;
 						return true;
 					}
 					return false;
 				}
 			});
-			font = new BitmapFont(Gdx.files.internal("fontSmall.fnt"));//change to more visible one
-			this.posX = posX+6f;
-	}
-	
-	public void reset(){
-		count = this.maxCount;
+			font = new BitmapFont(Gdx.files.internal("font/creatorFont.fnt"));//change to more visible one
+			this.posX = posX+6f;//hack
+			costStr = Integer.toString(cost);//optimization?
 	}
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		sprite.draw(batch);
-		font.draw(batch, Integer.toString(count), posX, 12f, 8, Align.center, false); //hack values
+		font.draw(batch, costStr, posX, 15f, 8, Align.center, false); //hack values
 	}
 }

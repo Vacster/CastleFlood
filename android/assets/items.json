@@ -3,63 +3,80 @@
     "width": 7.5, 
     "height": 19.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":2
   },
   "rock": {
     "width": 12.5, 
     "height": 12.5,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":4
+  },
+  "rockPillar": {
+    "width": 10.0, 
+    "height": 30.0,
+    "density": 5.0,
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":10
   },
   "woodenBox": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":5
   },
   "bronze": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":10
   },
   "iron": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":15
   },
   "concreteBox": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":7
   },
   "steelBox": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":20
   },
   "goldBox": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":25
   },
   "concreteTriangle": {
     "width": 10.0, 
     "height": 10.0,
     "density": 5.0,
-    "friction": 0.6,
-    "restitution": 0.0
+    "friction": 1.0,
+    "restitution": 0.0,
+    "cost":10
   }
 }

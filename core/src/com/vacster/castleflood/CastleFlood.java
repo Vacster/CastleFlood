@@ -40,7 +40,7 @@ public class CastleFlood extends ApplicationAdapter {
 		camera.setToOrtho(true, width, height);
 		world = new World(new Vector2(0, -98f), true);
 		
-		uiskin = new Skin(Gdx.files.internal("uiskin.json"));
+		uiskin = new Skin(Gdx.files.internal("font/uiskin.json"));
 		
 		changeStage(STAGE.MAINMENU);
 	}

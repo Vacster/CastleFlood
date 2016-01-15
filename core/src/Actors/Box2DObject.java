@@ -11,14 +11,14 @@ public class Box2DObject extends Actor{
 	private Body body;
 	private Sprite sprite;
 	
-	public Box2DObject(Box2DDefinition definition) {
+	public Box2DObject(final Box2DDefinition definition) {
 		body = definition.getWorld().createBody(definition.getBodyDef());
 		body.createFixture(definition.getFixtureDef());
 		body.setBullet(true);
-		this.sprite = new Sprite(definition.getSprite());
-		this.sprite.setSize(definition.getWidth(), definition.getHeight());
-		this.sprite.setCenter(body.getLocalCenter().x, body.getLocalCenter().y);
-		this.sprite.setOriginCenter();
+		sprite = new Sprite(definition.getSprite());
+		sprite.setSize(definition.getWidth(), definition.getHeight());
+		sprite.setCenter(body.getLocalCenter().x, body.getLocalCenter().y);
+		sprite.setOriginCenter();
 	}
 	
 	@Override
@@ -29,8 +29,8 @@ public class Box2DObject extends Actor{
 	
 	@Override
 	public void act(float delta) {
-		sprite.setPosition(body.getPosition().x - (sprite.getWidth()/2), body.getPosition().y - (sprite.getHeight()/2));
-		sprite.setRotation((float) Math.toDegrees(body.getAngle()));
+		sprite.setPosition(body.getPosition().x - (sprite.getWidth()/2), body.getPosition().y - (sprite.getHeight()/2));//expensive shit - fix somehow
+		sprite.setRotation((float) Math.toDegrees(body.getAngle()));//expensive...?
 		super.act(delta);
 	}
 }

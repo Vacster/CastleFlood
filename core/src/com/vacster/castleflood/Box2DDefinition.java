@@ -16,6 +16,7 @@ public class Box2DDefinition {
 	private PolygonShape shape;
 	private Sprite sprite;
 	private float width, height;
+	private int cost;
 	
 	public Box2DDefinition(float[] values, PolygonShape shape, Sprite sprite, World world) {
 		bodyDef = new BodyDef();
@@ -35,6 +36,11 @@ public class Box2DDefinition {
 		this.width = values[0];
 		this.height = values[1];
 		this.world = world;
+		this.cost = (int) values[7];
+	}
+	
+	public int getCost(){
+		return cost;
 	}
 	
 	public BodyDef getBodyDef() {

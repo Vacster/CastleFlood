@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class Lock extends Actor{
+public class Lock extends Actor{//kinda ugly, need to fix
 
 	Sprite sprite;
 	

@@ -128,10 +128,13 @@ public class GameStage extends Stage implements GestureListener{
 			if(!fixture.testPoint(unprojecter.x, unprojecter.y))
 				return true;
 		
-			mouseJointDef.bodyB = fixture.getBody();
-			mouseJointDef.target.set( unprojecter.x, unprojecter.y);//Previously: fixture.getBody().getPosition().x, fixture.getBody().getPosition().y
-			mouseJoint = (MouseJoint) world.createJoint(mouseJointDef);
-			return false;
+			if(fixture.getBody() != floor.body){
+				mouseJointDef.bodyB = fixture.getBody();
+				mouseJointDef.target.set( unprojecter.x, unprojecter.y);//Previously: fixture.getBody().getPosition().x, fixture.getBody().getPosition().y
+				mouseJoint = (MouseJoint) world.createJoint(mouseJointDef);
+				return false;
+			}
+			return true;
 		}
 	};
 
@@ -148,8 +151,7 @@ public class GameStage extends Stage implements GestureListener{
 		if(mouseJoint == null || paused || playing)
 			return false;
 		
-		world.destroyJoint(mouseJoint);
-		mouseJoint = null;
+		destroyMouseJoint();
 		return true;
 	}
 	@Override
@@ -160,6 +162,13 @@ public class GameStage extends Stage implements GestureListener{
 		camera.unproject(unprojecter.set(screenX, screenY, 0));
 		mouseJoint.setTarget(unprojecterHelper.set(unprojecter.x, unprojecter.y));
 		return true;
+	}
+	public void destroyMouseJoint() {
+		if(mouseJoint != null){			
+			world.destroyJoint(mouseJoint);
+			mouseJoint = null;
+		}
+		
 	}
 
 	@Override

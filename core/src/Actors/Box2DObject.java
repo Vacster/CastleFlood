@@ -14,7 +14,7 @@ public class Box2DObject extends Actor{
 	public Box2DObject(final Box2DDefinition definition) {
 		body = definition.getWorld().createBody(definition.getBodyDef());
 		body.createFixture(definition.getFixtureDef());
-		body.setBullet(true);
+		body.setBullet(false);
 		sprite = new Sprite(definition.getSprite());
 		sprite.setSize(definition.getWidth(), definition.getHeight());
 		sprite.setCenter(body.getLocalCenter().x, body.getLocalCenter().y);

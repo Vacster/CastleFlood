@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g3d.particles.influencers.ColorInfluencer.Random;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -22,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -36,14 +36,13 @@ import com.vacster.castleflood.CastleFlood;
 import com.vacster.castleflood.ItemLoader;
 import com.vacster.castleflood.LevelLoader;
 
-import Actors.Background;
 import Actors.Box2DObjectCreator;
 import Actors.Lock;
 import Actors.PauseMenu;
 import Actors.WaterActor;
 
 public class HUDStage extends Stage{
-
+	
 	private OrthographicCamera camera;//changing this would be fucking horrible wow vvvvvv
 	private HashMap<String, Sprite> sprites;//could probably be <int, obj>
 	private HashMap<String, PolygonShape> shapes;//could probably be <int, obj>
@@ -65,9 +64,8 @@ public class HUDStage extends Stage{
 	private Sprite waterSpr;
 	private Task createWaterTask;
 	public boolean paused = false, playing = false;//state machine would be nice | can only be in one of three states, paused/playing/normal
-	private int currLocation = 0, waterAmount = 0, levelLength = 60;
-	public int currentCount;
-	private float fontScale = 0.15f, numberFontScale = 0.3f, locations[];;//hack
+	private int currLocation = 0, waterAmount = 0, levelLength = 30;
+	private float fontScale = 0.15f, numberFontScale = 0.3f, locations[], currentCount;//hack
 	private String concreteBox  = "concreteBox", concreteTriangle = "concreteTriangle",//could be simplified.... somehow?
 			woodenBox = "woodenBox", goldBox = "goldBox", steelBox = "steelBox", rock = "rock"
 			, stick = "stick", bronze = "bronze", iron = "iron", rockPillar = "rockPillar";
@@ -85,8 +83,6 @@ public class HUDStage extends Stage{
 		camera.setToOrtho(false, 320, 180);
 		
 		getViewport().setCamera(camera);
-		
-		addActor(new Background(new Texture(Gdx.files.internal("hud.png"))));
 
 		table = new Table();
 		table.setWidth(getWidth());
@@ -108,41 +104,22 @@ public class HUDStage extends Stage{
 		createWaterTask = new Task(){
 			@Override
 			public void run() {
-				Gdx.app.log("Timer", Integer.toString(currentCount));
 				if(!playing && !paused)
-					currentCount--;
-				if(currentCount == 50)//shitty tremble
-					shake(time, 10);//fix god damn
+					currentCount-=0.01f;
+				if(currentCount <= 20f && currentCount >= 19.95f)//shitty tremble
+					shake(time, 5);//fix god damn
 				if(currentCount <= 0)
-					createWater();
+					startPlay();
 			}
 		};
 		setTimer();
 		
-		initMenuButtons(skin, game);
+		initScene2DItems(skin, game);
 		table.addActor(pauseGroup);
 		table.setZIndex(1000);//arbitrary number so it's always on top
 	}
 	
-	private void shake(final Timer time, final int count){//Not convinced, new arraylist and new task always made
-		Array<Body> bodies = new Array<Body>();
-		world.getBodies(bodies);
-		float randomY = MathUtils.random(5000, 10000);
-		float randomX = MathUtils.random(-12000, 12000);
-		for(Body b : bodies)
-			if(b.getPosition().y < 60f)	
-				b.applyLinearImpulse(randomX, randomY, b.getWorldCenter().x, b.getWorldCenter().y, true);
-			
-		time.scheduleTask(new Task(){
-			@Override
-			public void run() {
-				if(count > 0)
-					shake(time, reduceOne(count));//I still dont get this final stuff
-			}
-		}, 0.2f);
-	}
-	
-	private void initMenuButtons(Skin skin, final CastleFlood game){
+	private void initScene2DItems(Skin skin, final CastleFlood game){
 		
 		menuGroup = new Group();
 		menuGroup.addActor(new PauseMenu(210f, 110f, sprites.get("pauseMenu")));//own class because... reasons!
@@ -171,8 +148,8 @@ public class HUDStage extends Stage{
 		menuGroup.addActor(restartButton);
 		
 		ImageButton quitButton = new ImageButton(skin, "menuquit");
-		quitButton.setSize(50, 30);
-		quitButton.setPosition(170, 50);
+		quitButton.setSize(50, 30);//hack
+		quitButton.setPosition(170, 50);//hack
 		quitButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -183,10 +160,9 @@ public class HUDStage extends Stage{
 		menuGroup.addActor(quitButton);
 		
 		pauseGroup = new Group();
-		
 		final HUDStage thisStage = this;//lmao
 		ImageButton pauseButton = new ImageButton(skin, "menupause");
-		pauseButton.setSize(22f, 22f);
+		pauseButton.setSize(22f, 22f);//hack
 		pauseButton.setPosition(0f,  158f);//hack
 		pauseButton.addListener(new ClickListener(){
 			@Override
@@ -197,12 +173,12 @@ public class HUDStage extends Stage{
 		pauseGroup.addActor(pauseButton);
 		
 		ImageButton playButton = new ImageButton(skin, "menuplaywater");
-		playButton.setSize(22f, 22f);
-		playButton.setPosition(298, 158f);
+		playButton.setSize(22f, 22f);//hack
+		playButton.setPosition(298, 158f);//hack
 		playButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(!playing)createWater();
+				if(!playing)startPlay();
 			}
 		});
 		pauseGroup.addActor(playButton);
@@ -220,6 +196,46 @@ public class HUDStage extends Stage{
 		label.setTouchable(Touchable.disabled);
 		pauseGroup.addActor(label);
 		
+		Label timeLabel = new Label("null", skin){
+			@Override
+			public void draw(Batch batch, float parentAlpha) {
+				setVisible(!playing);
+				setText(String.format("%.0f", currentCount));
+				super.draw(batch, parentAlpha);
+			}
+		};
+		timeLabel.setFontScale(numberFontScale);
+		timeLabel.setPosition(90f, 142f);//hack
+		timeLabel.setTouchable(Touchable.disabled);
+		pauseGroup.addActor(timeLabel);
+		
+		final float multiple = (float) ((levelLength/10) / (Math.pow((float)levelLength/60, 2)));//I'm a fucking genius
+		Texture timer = new Texture(Gdx.files.internal("timer.png"));
+		Image timerImage = new Image(timer){
+			@Override
+			public void act(float delta) {
+				setX(currentCount*multiple-getWidth());//starts wrong
+			}
+			@Override
+			public void draw(Batch batch, float parentAlpha) {
+				if(!playing && !paused)
+					super.draw(batch, parentAlpha);
+			}
+		};
+		timerImage.setY(100);//hack
+		timerImage.setX(getWidth());
+		timerImage.setWidth(40);//hack
+		timerImage.setHeight(20);//hack
+		addActor(timerImage);
+		
+		final Texture hudText = new Texture(Gdx.files.internal("hud.png"));
+		Image hud = new Image(hudText){
+			@Override
+			public void draw(Batch batch, float parentAlpha) {
+				batch.draw(hudText, 0, 0, 320, 180);
+			}
+		};
+		addActor(hud);
 	}
 
 	private void initStrings(){//kinda ugly / repetitive. let's make a json! lel. actually, that could work...? jsonvalue.getindex(int) ..?
@@ -234,7 +250,6 @@ public class HUDStage extends Stage{
 		creators.add(steelBox);
 		creators.add(goldBox);
 		creators.add(concreteTriangle);
-//	
 	}
 	
 	private float[] setLocations(){
@@ -325,9 +340,9 @@ public class HUDStage extends Stage{
 		
 		waterShape.setRadius(4f); //hack
 		waterBodyDef.type = BodyType.DynamicBody;
-		waterFixtureDef.density = 6f;
+		waterFixtureDef.density = 8f;
 		waterFixtureDef.friction = 0.1f;
-		waterFixtureDef.restitution = 0.8f;
+		waterFixtureDef.restitution = 0.85f;
 		waterFixtureDef.shape = waterShape;
 	}
 	
@@ -351,10 +366,11 @@ public class HUDStage extends Stage{
 			addActor(new Lock(locations[y], sprites.get("lock")));
 	}
 	
-	private void createWater() {
+	private void startPlay() {
 		Timer.instance().clear();
 		playing = true;
 		gamestage.playing = true;
+		gamestage.destroyMouseJoint();
 		for(int x = 0; x < waterAmount; x++)
 			water.add(new WaterActor(10f, x+40f, waterFixtureDef, waterBodyDef, waterShape, waterSpr, world));
 		
@@ -366,7 +382,6 @@ public class HUDStage extends Stage{
 		getActors().clear();
 		water.clear();
 		creatorObjects.clear();
-		addActor(new Background(new Texture(Gdx.files.internal("hud.png"))));
 		
 		playing = false;
 		gamestage.playing = false;
@@ -374,11 +389,12 @@ public class HUDStage extends Stage{
 		table.setWidth(getWidth());
 		table.setHeight(getHeight());
 		initCreators(gamestage);
+		
+		pauseGroup.clear();
+		initScene2DItems(skin, CFGame);
 		addActor(table);
-		
-		initMenuButtons(skin, CFGame);
 		//setDebugAll(true);
-		
+
 		gamestage.restart();
 		handlePause();
 
@@ -423,7 +439,7 @@ public class HUDStage extends Stage{
 
 	private void setTimer(){
 		currentCount = levelLength;
-		Timer.schedule(createWaterTask, 1, 1, levelLength);
+		Timer.schedule(createWaterTask, 0.01f, 0.01f, levelLength*100);
 	}
 	
 	private float setOffset(String str){//Special cases | hack?
@@ -435,6 +451,24 @@ public class HUDStage extends Stage{
 		default:
 			return 0;
 		}
+	}
+	
+	private void shake(final Timer time, final int count){//Not convinced, new arraylist and new task always made
+		Array<Body> bodies = new Array<Body>();
+		world.getBodies(bodies);
+		float randomY = MathUtils.random(800, 2000);
+		float randomX = MathUtils.random(-6000, 6000);
+		for(Body b : bodies)
+			if(b.getPosition().y < 60f)	
+				b.applyLinearImpulse(randomX, randomY, b.getWorldCenter().x, b.getWorldCenter().y, true);
+			
+		time.scheduleTask(new Task(){
+			@Override
+			public void run() {
+				if(count > 0)
+					shake(time, reduceOne(count));//I still dont get this final stuff
+			}
+		}, 0.2f);
 	}
 	
 	private int reduceOne(int x){//fuck

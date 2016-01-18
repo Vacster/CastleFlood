@@ -15,6 +15,5 @@ public class Background extends Actor{
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		batch.draw(txt, 0, 0, 320, 180);
-		super.draw(batch, parentAlpha);
 	}
 }

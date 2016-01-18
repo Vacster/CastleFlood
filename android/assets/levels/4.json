@@ -1,14 +1,15 @@
 {
-  "stick": 5,
-  "rock": 5,
-  "rockPillar": 5,
-  "woodenBox": 0,
-  "bronze": 5,
-  "concreteBox": 0,
-  "iron": 5,
-  "concreteTriangle": 0,
-  "steelBox": 0,
-  "goldBox": 0,
+  "stick": true,
+  "rock": true,
+  "rockPillar": true,
+  "woodenBox": false,
+  "bronze": true,
+  "concreteBox": false,
+  "iron": true,
+  "concreteTriangle": false,
+  "steelBox": false,
+  "goldBox": false,
   "waterAmount": 100,
-  "resources": 50
+  "resources": 50,
+  "length": 30
 }

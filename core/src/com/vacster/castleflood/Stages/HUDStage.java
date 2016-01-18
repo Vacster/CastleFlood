@@ -64,7 +64,7 @@ public class HUDStage extends Stage{
 	private Sprite waterSpr;
 	private Task createWaterTask;
 	public boolean paused = false, playing = false;//state machine would be nice | can only be in one of three states, paused/playing/normal
-	private int currLocation = 0, waterAmount = 0, levelLength = 30;
+	private int currLocation = 0, waterAmount, levelLength;
 	private float fontScale = 0.15f, numberFontScale = 0.3f, locations[], currentCount;//hack
 	private String concreteBox  = "concreteBox", concreteTriangle = "concreteTriangle",//could be simplified.... somehow?
 			woodenBox = "woodenBox", goldBox = "goldBox", steelBox = "steelBox", rock = "rock"
@@ -95,6 +95,7 @@ public class HUDStage extends Stage{
 		initShapes();
 		initWater();
 		setDefinitions(world);
+		initScene2DItems(skin, game);
 		initCreators(gameStage);
 		
 		addActor(table);
@@ -114,7 +115,6 @@ public class HUDStage extends Stage{
 		};
 		setTimer();
 		
-		initScene2DItems(skin, game);
 		table.addActor(pauseGroup);
 		table.setZIndex(1000);//arbitrary number so it's always on top
 	}
@@ -252,7 +252,7 @@ public class HUDStage extends Stage{
 		creators.add(concreteTriangle);
 	}
 	
-	private float[] setLocations(){
+	private float[] setLocations(){//because reasons
 		float array[] = {27f, 66f, 106f, 147f, 187f, 227f, 267f};//hack
 		return array;
 	}
@@ -260,10 +260,10 @@ public class HUDStage extends Stage{
 	private void initLevel(int level){
 		items = new HashMap<String, Boolean>();
 		LevelLoader loader = new LevelLoader(level, creators);
-		for(int x = 0; x < creators.size(); x++){
-			items.put(creators.get(x), loader.getAmount(x));
-		}
+		for(int x = 0; x < creators.size(); x++)//creators.size is wrong
+			items.put(creators.get(x), loader.getExists(x));
 		waterAmount = loader.getWater();
+		levelLength = loader.getLength();
 		gamestage.updateResources(loader.getResources());
 	}
 	
@@ -362,7 +362,7 @@ public class HUDStage extends Stage{
 			if(items.get(str))
 				addCreator(str, gameStage, x++);
 		
-		for(int y = x; y < 7; y++)
+		for(int y = creatorObjects.size(); y < 7; y++)
 			addActor(new Lock(locations[y], sprites.get("lock")));
 	}
 	
@@ -388,10 +388,10 @@ public class HUDStage extends Stage{
 		table = new Table();
 		table.setWidth(getWidth());
 		table.setHeight(getHeight());
-		initCreators(gamestage);
-		
 		pauseGroup.clear();
 		initScene2DItems(skin, CFGame);
+		initCreators(gamestage);
+		
 		addActor(table);
 		//setDebugAll(true);
 
@@ -456,10 +456,10 @@ public class HUDStage extends Stage{
 	private void shake(final Timer time, final int count){//Not convinced, new arraylist and new task always made
 		Array<Body> bodies = new Array<Body>();
 		world.getBodies(bodies);
-		float randomY = MathUtils.random(800, 2000);
-		float randomX = MathUtils.random(-6000, 6000);
+		float randomY = MathUtils.random(800, 1500);
+		float randomX = MathUtils.random(-7500, 7500);
 		for(Body b : bodies)
-			if(b.getPosition().y < 60f)	
+			if(b.getPosition().y < 60f)	//hack
 				b.applyLinearImpulse(randomX, randomY, b.getWorldCenter().x, b.getWorldCenter().y, true);
 			
 		time.scheduleTask(new Task(){

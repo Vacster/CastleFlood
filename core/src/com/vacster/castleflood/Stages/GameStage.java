@@ -54,7 +54,7 @@ public class GameStage extends Stage implements GestureListener{
 		mouseJointDef = new MouseJointDef();
 		mouseJointDef.bodyA = floor.body;
 		mouseJointDef.collideConnected = true;//idk, but it was in the tutorial
-		mouseJointDef.maxForce = 250000.0f;//fix if objects' density changes dramatically
+		mouseJointDef.maxForce = 500000.0f;//fix if objects' density changes dramatically
 	}
 	
 	public void restart(){

@@ -10,6 +10,5 @@
   "steelBox": false,
   "goldBox": false,
   "waterAmount": 100,
-  "resources": 50,
-  "length": 30
+  "resources": 50
 }
